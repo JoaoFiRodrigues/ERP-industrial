@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Mini ERP - Manutenção Industrial</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+  <style>
+    body {
+      padding-top: 56px;
+    }
+    .tela {
+      display: none;
+    }
+    .tela.active {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="#">ERP Manutenção</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menuNav" aria-controls="menuNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="menuNav">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item"><a class="nav-link active" href="#" data-tela="solicitacao">Solicitação</a></li>
+        <li class="nav-item"><a class="nav-link" href="#" data-tela="atividades">Atividades</a></li>
+        <li class="nav-item"><a class="nav-link" href="#" data-tela="registro">Registro Técnico</a></li>
+        <li class="nav-item"><a class="nav-link" href="#" data-tela="gestao">Gestão</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="container mt-4">
+
+  <!-- Solicitação -->
+  <div id="solicitacao" class="tela active">
+    <h3>Solicitar Manutenção</h3>
+    <form id="formSolicitacao">
+      <div class="mb-3">
+        <label for="maquina" class="form-label">Máquina</label>
+        <select id="maquina" class="form-select" required>
+          <option value="" disabled selected>Selecione a máquina</option>
+          <option>Laser</option>
+          <option>Usinagem</option>
+          <option>Dobra</option>
+          <option>Solda</option>
+          <option>Pintura</option>
+          <option>Curvadora</option>
+          <option>Prensa</option>
+          <option>Conformadora</option>
+        </select>
+      </div>
+      <div class="mb-3">
+        <label for="problema" class="form-label">Descrição do Problema</label>
+        <input type="text" id="problema" class="form-control" required />
+      </div>
+      <div class="mb-3">
+        <label for="urgencia" class="form-label">Urgência</label>
+        <select id="urgencia" class="form-select" required>
+          <option value="" disabled selected>Selecione a urgência</option>
+          <option>Baixa</option>
+          <option>Média</option>
+          <option>Alta</option>
+        </select>
+      </div>
+      <div class="mb-3">
+        <label for="observacoes" class="form-label">Observações</label>
+        <textarea id="observacoes" class="form-control" rows="3"></textarea>
+      </div>
+      <button type="submit" class="btn btn-primary">Enviar Solicitação</button>
+    </form>
+  </div>
+
+  <!-- Atividades -->
+  <div id="atividades" class="tela">
+    <h3>Atividades Pendentes</h3>
+    <div id="listaAtividades"></div>
+  </div>
+
+  <!-- Registro Técnico -->
+  <div id="registro" class="tela">
+    <h3>Registrar Conclusão de Manutenção</h3>
+    <form id="formRegistro">
+      <div class="mb-3">
+        <label for="selectMaquinaPend" class="form-label">Máquina</label>
+        <select id="selectMaquinaPend" class="form-select" required>
+          <!-- Opções preenchidas dinamicamente -->
+        </select>
+      </div>
+      <div class="mb-3">
+        <label for="acaoFeita" class="form-label">Ação Executada</label>
+        <input type="text" id="acaoFeita" class="form-control" required />
+      </div>
+      <div class="mb-3">
+        <label for="tempoGasto" class="form-label">Tempo Gasto (horas)</label>
+        <input type="number" step="0.1" id="tempoGasto" class="form-control" required />
+      </div>
+      <div class="mb-3">
+        <label for="tecnico" class="form-label">Técnico Responsável</label>
+        <input type="text" id="tecnico" class="form-control" required />
+      </div>
+      <button type="submit" class="btn btn-success">Registrar</button>
+    </form>
+  </div>
+
+  <!-- Gestão -->
+  <div id="gestao" class="tela">
+    <h3>Painel de Gestão</h3>
+    <p><strong>Total de Registros:</strong> <span id="totalRegs">0</span></p>
+    <p><strong>Tempo Total (horas):</strong> <span id="totalTempo">0</span></p>
+    <p><strong>Máquinas com mais registros:</strong> <span id="maquinasTop">-</span></p>
+
+    <canvas id="graficoGestao" style="max-height: 300px;"></canvas>
+
+    <hr />
+
+    <h5>Tarefas Concluídas</h5>
+    <div id="concluidas"></div>
+  </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
