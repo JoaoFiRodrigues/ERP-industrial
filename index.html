@@ -34,6 +34,7 @@
         <li class="nav-item"><a class="nav-link" href="#" data-tela="atividades">Atividades</a></li>
         <li class="nav-item"><a class="nav-link" href="#" data-tela="registro">Registro Técnico</a></li>
         <li class="nav-item"><a class="nav-link" href="#" data-tela="gestao">Gestão</a></li>
+        <li class="nav-item"><a class="nav-link" href="#" data-tela="abaMaquinas">Máquinas</a></li>
       </ul>
     </div>
   </div>
@@ -49,19 +50,76 @@
         <label for="maquina" class="form-label">Máquina</label>
         <select id="maquina" class="form-select" required>
           <option value="" disabled selected>Selecione a máquina</option>
-          <option>Laser</option>
-          <option>Usinagem</option>
-          <option>Dobra</option>
-          <option>Solda</option>
-          <option>Pintura</option>
-          <option>Curvadora</option>
-          <option>Prensa</option>
-          <option>Conformadora</option>
+          <option>CURV-03</option>
+          <option>CURV-06</option>
+          <option>CURV-07</option>
+          <option>CURV-08</option>
+          <option>CURV-09</option>
+          <option>CURV-10</option>
+          <option>CURV-13</option>
+          <option>REB-01</option>
+          <option>REB-02</option>
+          <option>SF-02</option>
+          <option>SF-03</option>
+          <option>SF-04</option>
+          <option>SF-05</option>
+          <option>SF-06</option>
+          <option>SD-02</option>
+          <option>SD-03</option>
+          <option>REBAR-04</option>
+          <option>CAL-03</option>
+          <option>CAL-04</option>
+          <option>CAL-06</option>
+          <option>CAL CH-02</option>
+          <option>FRESA-03</option>
+          <option>FRESA-04</option>
+          <option>FRESA-05</option>
+          <option>TORNO-02</option>
+          <option>TORNO-03</option>
+          <option>CDU-01</option>
+          <option>CDU-02</option>
+          <option>PRENSA-03</option>
+          <option>DOBRA-02</option>
+          <option>DOBRA-03</option>
+          <option>DOBRA-04</option>
+          <option>LIXADEIRA-02</option>
+          <option>LIXADEIRA-03</option>
+          <option>LIXADEIRA-04</option>
+          <option>LIXADEIRA-05</option>
+          <option>REBAR-01</option>
+          <option>REBAR-02</option>
+          <option>REBAR-03</option>
+          <option>REBAR-04</option>
+          <option>BOCA-01</option>
+          <option>LASER-01</option>
+          <option>LASER-02</option>
+          <option>LASER-03</option>
+          <option>LASER-04</option>
+          <option>FUR-01</option>
+          <option>FUR-02</option>
+          <option>FUR-03</option>
+          <option>ROS-01</option>
+          <option>ESM-01</option>
+          <option>ESM-02</option>
+          <option>ESM-03</option>
+          <option>ROB-01</option>
+          <option>COMPR-03</option>
+          <option>COMPR-05</option>
+          <option>COMPR-06</option>
+          <option>PR-01</option>
+          <option>PR-02</option>
         </select>
       </div>
       <div class="mb-3">
         <label for="problema" class="form-label">Descrição do Problema</label>
-        <input type="text" id="problema" class="form-control" required />
+        <select id="problema" class="form-select" required>
+          <option value="" disabled selected>Selecione o problema</option>
+            <option>Problemas Mecânicos</option>
+            <option>Problemas Eletricos</option>
+            <option>Problema de controle / automação</option>
+            <option>Problemas pneumáticos / hidráulicos</option>
+            <option>Problemas de limpeza</option>
+        </select>
       </div>
       <div class="mb-3">
         <label for="urgencia" class="form-label">Urgência</label>
@@ -69,7 +127,7 @@
           <option value="" disabled selected>Selecione a urgência</option>
           <option>Baixa</option>
           <option>Média</option>
-          <option>Alta</option>
+          <option>Alta - Maquina parada</option>
         </select>
       </div>
       <div class="mb-3">
@@ -87,30 +145,37 @@
   </div>
 
   <!-- Registro Técnico -->
-  <div id="registro" class="tela">
-    <h3>Registrar Conclusão de Manutenção</h3>
-    <form id="formRegistro">
-      <div class="mb-3">
-        <label for="selectMaquinaPend" class="form-label">Máquina</label>
-        <select id="selectMaquinaPend" class="form-select" required>
-          <!-- Opções preenchidas dinamicamente -->
-        </select>
-      </div>
-      <div class="mb-3">
-        <label for="acaoFeita" class="form-label">Ação Executada</label>
-        <input type="text" id="acaoFeita" class="form-control" required />
-      </div>
-      <div class="mb-3">
-        <label for="tempoGasto" class="form-label">Tempo Gasto (horas)</label>
-        <input type="number" step="0.1" id="tempoGasto" class="form-control" required />
-      </div>
-      <div class="mb-3">
-        <label for="tecnico" class="form-label">Técnico Responsável</label>
-        <input type="text" id="tecnico" class="form-control" required />
-      </div>
-      <button type="submit" class="btn btn-success">Registrar</button>
-    </form>
-  </div>
+ <div id="registro" class="tela">
+  <h3>Registrar Conclusão de Manutenção</h3>
+  <form id="formRegistro">
+    <div class="mb-3">
+      <label for="selectMaquinaPend" class="form-label">Máquina</label>
+      <select id="selectMaquinaPend" class="form-select" required>
+        <!-- Opções preenchidas dinamicamente -->
+      </select>
+    </div>
+    <div class="mb-3">
+      <label for="descricaoProblema" class="form-label">Descrição do Problema</label>
+      <input type="text" id="descricaoProblema" class="form-control" readonly />
+    </div>
+    <div class="mb-3">
+      <label for="acaoFeita" class="form-label">Ação Executada</label>
+      <input type="text" id="acaoFeita" class="form-control" required />
+    </div>
+    <div class="mb-3">
+      <label for="tempoGasto" class="form-label">Tempo Gasto (horas)</label>
+      <input type="number" step="0.1" id="tempoGasto" class="form-control" required />
+    </div>
+    <div class="mb-3">
+      <label for="tecnico" class="form-label">Técnico Responsável</label>
+      <select id="tecnico" class="form-control" required>
+        <option value="" disabled selected>Selecione o Técnico</option>
+        <option>Gabriel</option>
+      </select>
+    </div>
+    <button type="submit" class="btn btn-success">Registrar</button>
+  </form>
+</div>
 
   <!-- Gestão -->
   <div id="gestao" class="tela">
@@ -126,6 +191,54 @@
     <h5>Tarefas Concluídas</h5>
     <div id="concluidas"></div>
   </div>
+
+  <!-- ABA: Máquinas -->
+<div id="abaMaquinas" class="tela container mt-4">
+  <h2 class="mb-4">Cadastro e Histórico das Máquinas</h2>
+
+  <!-- Tabela de máquinas -->
+  <div class="table-responsive mb-5">
+    <table class="table table-bordered" id="tabelaMaquinas">
+      <thead class="table-light">
+        <tr>
+          <th>Número</th>
+          <th>Nome</th>
+          <th>Modelo</th>
+          <th>Marca</th>
+          <th>Ano</th>
+          <th>Potência</th>
+          <th>Pressão</th>
+          <th>Capacidade</th>
+          <th>Número de Série</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody id="listaMaquinas"></tbody>
+    </table>
+  </div>
+
+  <!-- Histórico por máquina -->
+  <div id="historicoMaquina" class="mt-4" style="display:none">
+    <h4>Histórico da Máquina <span id="nomeMaquinaSelecionada"></span> (Nº <span id="numeroMaquinaSelecionada"></span>)</h4>
+    <div class="table-responsive">
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>Data</th>
+            <th>Problema</th>
+            <th>Ação</th>
+            <th>Técnico</th>
+            <th>Tempo (h)</th>
+            <th>Observações</th>
+          </tr>
+        </thead>
+        <tbody id="historicoTabela"></tbody>
+      </table>
+    </div>
+    <button class="btn btn-secondary mt-3" onclick="voltarListaMaquinas()">Voltar</button>
+  </div>
+</div>
+
 
 </div>
 

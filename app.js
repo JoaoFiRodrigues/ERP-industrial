@@ -13,7 +13,12 @@ const db = firebase.firestore();
 // Navegação entre abas/telas
 function mostrar(telaId) {
   document.querySelectorAll('.tela').forEach(tela => tela.classList.remove('active'));
-  document.getElementById(telaId).classList.add('active');
+  const tela = document.getElementById(telaId);
+  tela.classList.add('active');
+
+  if (telaId === "abaMaquinas") {
+    carregarMaquinas();
+  }
 }
 document.querySelectorAll('nav .nav-link').forEach(link => {
   link.addEventListener('click', e => {
@@ -60,10 +65,10 @@ document.getElementById("formSolicitacao").addEventListener("submit", function(e
 // Atualiza select de máquinas pendentes no registro técnico
 function atualizarSelectMaquinasPendentes() {
   const select = document.getElementById("selectMaquinaPend");
-  db.collection("solicitacoes").where("status", "==", "Pendente").onSnapshot(snapshot => {
+  select.innerHTML = '<option value="" disabled selected>Selecione a Máquina</option>';
+  db.collection("solicitacoes").where("status", "==", "Pendente").get().then(snapshot => {
     const maquinas = new Set();
     snapshot.forEach(doc => maquinas.add(doc.data().maquina));
-    select.innerHTML = "";
     maquinas.forEach(m => {
       const option = document.createElement("option");
       option.textContent = m;
@@ -72,6 +77,33 @@ function atualizarSelectMaquinasPendentes() {
     });
   });
 }
+
+// Ao mudar máquina pendente selecionada, busca problema e mostra no campo descrição problema
+document.getElementById("selectMaquinaPend").addEventListener("change", async function() {
+  const maquina = this.value;
+  const descricaoProblema = document.getElementById("descricaoProblema");
+  descricaoProblema.value = "Carregando...";
+
+  if (!maquina) {
+    descricaoProblema.value = "";
+    return;
+  }
+
+  const snapshot = await db.collection("solicitacoes")
+    .where("maquina", "==", maquina)
+    .where("status", "==", "Pendente")
+    .orderBy("data")
+    .limit(1)
+    .get();
+
+  if (snapshot.empty) {
+    descricaoProblema.value = "Nenhuma tarefa pendente para esta máquina.";
+    return;
+  }
+
+  const doc = snapshot.docs[0].data();
+  descricaoProblema.value = doc.problema || "";
+});
 
 // Formulário de registro técnico para concluir tarefa
 document.getElementById("formRegistro").addEventListener("submit", async function(e) {
@@ -111,6 +143,7 @@ document.getElementById("formRegistro").addEventListener("submit", async functio
 
     alert("Tarefa registrada com sucesso!");
     this.reset();
+    document.getElementById("descricaoProblema").value = "";
 
     atualizarSelectMaquinasPendentes();
     carregarAtividades();
@@ -134,6 +167,7 @@ function carregarAtividades() {
         <b>Máquina:</b> ${d.maquina}<br>
         <b>Problema:</b> ${d.problema}<br>
         <b>Urgência:</b> ${d.urgencia}<br>
+        <b>Observações:</b> ${d.observacoes || '-'}<br>
         <b>Data:</b> ${new Date(d.data).toLocaleString()}
       </div>`;
     });
@@ -147,12 +181,17 @@ function atualizarGestao() {
     let tempoTotal = 0;
     const maquinas = {};
     const concluidas = [];
+    const problemasContagem = {};
 
     snapshot.forEach(doc => {
       const d = doc.data();
       if (d.status === "Resolvido") concluidas.push(d);
       if (d.tempo) tempoTotal += d.tempo;
       maquinas[d.maquina] = (maquinas[d.maquina] || 0) + 1;
+
+      // Contagem problemas para gráfico (5 opções fixas)
+      const p = d.problema || "Outro";
+      problemasContagem[p] = (problemasContagem[p] || 0) + 1;
     });
 
     document.getElementById("totalRegs").textContent = total;
@@ -176,12 +215,15 @@ function atualizarGestao() {
       </div>`;
     });
 
-    // Atualiza gráfico, se canvas existir
-    const tipos = { Corretiva: 0, Preventiva: 0, Preditiva: 0 };
-    snapshot.forEach(doc => {
-      const tipo = doc.data().tipo || "Corretiva";
-      tipos[tipo] = (tipos[tipo] || 0) + 1;
-    });
+    // Atualiza gráfico com 5 opções da descrição do problema fixas
+    const problemasFixos = [
+      "Problemas Mecânicos",
+      "Problemas Eletricos",
+      "Problema de controle / automação",
+      "Problemas pneumáticos / hidráulicos",
+      "Problemas de limpeza"
+    ];
+    const dataGrafico = problemasFixos.map(p => problemasContagem[p] || 0);
 
     const ctx = document.getElementById("graficoGestao");
     if (ctx) {
@@ -189,11 +231,11 @@ function atualizarGestao() {
       window.grafico = new Chart(ctx, {
         type: 'bar',
         data: {
-          labels: Object.keys(tipos),
+          labels: problemasFixos,
           datasets: [{
-            label: 'Distribuição por Tipo',
-            data: Object.values(tipos),
-            backgroundColor: ['#dc3545', '#0d6efd', '#ffc107']
+            label: 'Ocorrências',
+            data: dataGrafico,
+            backgroundColor: '#0d6efd'
           }]
         },
         options: {
@@ -209,3 +251,73 @@ function atualizarGestao() {
 atualizarSelectMaquinasPendentes();
 carregarAtividades();
 atualizarGestao();
+
+const maquinas = [
+  // Exemplo de máquinas pré-cadastradas (você pode carregar dinamicamente do Firebase se quiser)
+  {
+    numero: "001",
+    nome: "Laser",
+    modelo: "LX200",
+    marca: "Cortech",
+    ano: 2018,
+    potencia: "2kW",
+    pressao: "12 bar",
+    capacidade: "500mm",
+    numeroSerie: "ABC1234"
+  },
+  // Adicione mais conforme sua planilha...
+];
+
+function carregarMaquinas() {
+  const tbody = document.getElementById("listaMaquinas");
+  tbody.innerHTML = "";
+  maquinas.forEach((m, i) => {
+    tbody.innerHTML += `
+      <tr>
+        <td>${m.numero}</td>
+        <td>${m.nome}</td>
+        <td>${m.modelo}</td>
+        <td>${m.marca}</td>
+        <td>${m.ano}</td>
+        <td>${m.potencia}</td>
+        <td>${m.pressao}</td>
+        <td>${m.capacidade}</td>
+        <td>${m.numeroSerie}</td>
+        <td><button class="btn btn-sm btn-primary" onclick="verHistorico('${m.numero}', '${m.nome}')">Ver Histórico</button></td>
+      </tr>`;
+  });
+}
+
+async function verHistorico(numero, nome) {
+  document.getElementById("abaMaquinas").querySelector(".table-responsive").style.display = "none";
+  document.getElementById("historicoMaquina").style.display = "block";
+  document.getElementById("nomeMaquinaSelecionada").textContent = nome;
+  document.getElementById("numeroMaquinaSelecionada").textContent = numero;
+
+  const tbody = document.getElementById("historicoTabela");
+  tbody.innerHTML = "Carregando...";
+
+  const snapshot = await db.collection("solicitacoes")
+    .where("status", "==", "Resolvido")
+    .where("numero", "==", numero)
+    .get();
+
+  tbody.innerHTML = "";
+  snapshot.forEach(doc => {
+    const d = doc.data();
+    tbody.innerHTML += `
+      <tr>
+        <td>${new Date(d.resolvidoEm).toLocaleDateString()}</td>
+        <td>${d.problema}</td>
+        <td>${d.acao}</td>
+        <td>${d.tecnico}</td>
+        <td>${d.tempo}</td>
+        <td>${d.observacoes || "-"}</td>
+      </tr>`;
+  });
+}
+
+function voltarListaMaquinas() {
+  document.getElementById("historicoMaquina").style.display = "none";
+  document.getElementById("abaMaquinas").querySelector(".table-responsive").style.display = "block";
+}
